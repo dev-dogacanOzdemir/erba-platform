@@ -1,0 +1,27 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  profiles:
+    active: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/erba_platform
+    username: erba
+    password: erba
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: auth
+    show-sql: true
+
+jwt:
+  secret: "change-this-secret-key-change-this-secret-key"
+  access-token-expiration: 3600000
+  refresh-token-expiration: 604800000
+
