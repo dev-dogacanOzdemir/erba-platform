@@ -2,13 +2,17 @@ package com.appsolute.erba.identity.rest.controller;
 
 import com.appsolute.erba.identity.application.dto.*;
 import com.appsolute.erba.identity.application.service.CreateIdentityUserService;
+import com.appsolute.erba.identity.application.service.DeleteIdentityUserService;
 import com.appsolute.erba.identity.application.service.GetIdentityUserService;
 import com.appsolute.erba.identity.application.service.UpdateIdentityUserService;
+import com.appsolute.erba.identity.domain.valueobject.*;
 import com.appsolute.erba.identity.rest.dto.*;
+import com.appsolute.erba.identity.rest.mapper.EnumConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.UUID;
 
@@ -20,10 +24,11 @@ public class IdentityUserController {
     private final CreateIdentityUserService createIdentityUserService;
     private final GetIdentityUserService getIdentityUserService;
     private final UpdateIdentityUserService updateIdentityUserService;
+    private final DeleteIdentityUserService deleteIdentityUserService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateIdentityUserResponse create(@RequestBody CreateIdentityUserRequest request) {
+    public CreateIdentityUserResponse create(@Valid @RequestBody CreateIdentityUserRequest request) {
         CreateIdentityUserResult result = createIdentityUserService.create(toCommand(request));
 
         return new CreateIdentityUserResponse(result.identityUserId());
@@ -38,24 +43,30 @@ public class IdentityUserController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(
             @PathVariable("id") UUID id,
-            @RequestBody UpdateIdentityUserRequest request
+            @Valid @RequestBody UpdateIdentityUserRequest request
     ) {
         updateIdentityUserService.update(toCommand(id, request));
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable("id") UUID id) {
+        deleteIdentityUserService.delete(id);
+    }
+
     private CreateIdentityUserCommand toCommand(CreateIdentityUserRequest request) {
         return new CreateIdentityUserCommand(
-                request.userType(),
+                EnumConverter.toDomain(request.userType()),
                 request.email(),
                 request.firstName(),
                 request.lastName(),
                 request.phone(),
                 new CreateEmployeeProfileCommand(
                         request.employeeProfile().employeeNumber(),
-                        request.employeeProfile().department(),
-                        request.employeeProfile().position(),
-                        request.employeeProfile().employmentType(),
+                        EnumConverter.toDomain(request.employeeProfile().department()),
+                        EnumConverter.toDomain(request.employeeProfile().position()),
+                        EnumConverter.toDomain(request.employeeProfile().employmentType()),
                         request.employeeProfile().hireDate(),
                         request.employeeProfile().birthDate()
                 ),
@@ -70,8 +81,8 @@ public class IdentityUserController {
         return new GetIdentityUserResponse(
                 result.id(),
                 result.authUserId(),
-                new EnumResponse(result.userType(), result.userTypeLabel()),
-                new EnumResponse(result.status(), result.statusLabel()),
+                EnumConverter.toResponse(UserType.valueOf(result.userType())),
+                EnumConverter.toResponse(UserStatus.valueOf(result.status())),
                 result.email(),
                 result.firstName(),
                 result.lastName(),
@@ -87,9 +98,9 @@ public class IdentityUserController {
         return new GetEmployeeProfileResponse(
                 result.id(),
                 result.employeeNumber(),
-                new EnumResponse(result.department(), result.departmentLabel()),
-                new EnumResponse(result.position(), result.positionLabel()),
-                new EnumResponse(result.employmentType(), result.employmentTypeLabel()),
+                EnumConverter.toResponse(Department.valueOf(result.department())),
+                EnumConverter.toResponse(Position.valueOf(result.position())),
+                EnumConverter.toResponse(EmploymentType.valueOf(result.employmentType())),
                 result.hireDate(),
                 result.terminationDate(),
                 result.birthDate(),
@@ -105,8 +116,8 @@ public class IdentityUserController {
         return new UpdateIdentityUserCommand(
                 id,
                 request.authUserId(),
-                request.userType(),
-                request.status(),
+                EnumConverter.toDomain(request.userType()),
+                EnumConverter.toDomain(request.status()),
                 request.email(),
                 request.firstName(),
                 request.lastName(),
@@ -119,9 +130,9 @@ public class IdentityUserController {
     private UpdateEmployeeProfileCommand toCommand(UpdateEmployeeProfileRequest request) {
         return new UpdateEmployeeProfileCommand(
                 request.employeeNumber(),
-                request.department(),
-                request.position(),
-                request.employmentType(),
+                EnumConverter.toDomain(request.department()),
+                EnumConverter.toDomain(request.position()),
+                EnumConverter.toDomain(request.employmentType()),
                 request.hireDate(),
                 request.terminationDate(),
                 request.birthDate()

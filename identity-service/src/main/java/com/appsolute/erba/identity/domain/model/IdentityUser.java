@@ -129,6 +129,12 @@ public class IdentityUser {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void delete() {
+        this.status = UserStatus.DELETED;
+        this.deletedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public void linkAuthUser(UUID authUserId) {
         if (authUserId == null) {
             throw new IllegalArgumentException("Auth user id boş olamaz.");
