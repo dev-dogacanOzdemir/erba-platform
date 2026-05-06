@@ -20,8 +20,8 @@ spring:
         default_schema: auth
     show-sql: true
 
-jwt:
-  secret: "change-this-secret-key-change-this-secret-key"
-  access-token-expiration: 3600000
-  refresh-token-expiration: 604800000
+auth:
+  jwt:
+    secret: "change-this-secret-key-must-be-at-least-32-characters-long"
+    access-token-expiration-seconds: 900
 

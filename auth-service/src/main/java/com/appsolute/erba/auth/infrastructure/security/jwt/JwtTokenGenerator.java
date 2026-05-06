@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.Date;
@@ -16,11 +17,15 @@ import java.util.UUID;
 @Component
 public class JwtTokenGenerator implements TokenGenerator {
 
-    // 256-bit secure key
-    private static final SecretKey SECRET_KEY =
-            Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final AuthJwtProperties properties;
+    private final SecretKey secretKey;
 
-    private static final long ACCESS_TOKEN_EXPIRATION_SECONDS = 900;
+    public JwtTokenGenerator(AuthJwtProperties properties) {
+        this.properties = properties;
+        this.secretKey = Keys.hmacShaKeyFor(
+                properties.secret().getBytes(StandardCharsets.UTF_8)
+        );
+    }
 
     @Override
     public String generateAccessToken(UUID userId, String email, AuthRole role) {
@@ -31,8 +36,8 @@ public class JwtTokenGenerator implements TokenGenerator {
                 .claim("email", email)
                 .claim("role", role.name())
                 .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(now.plusSeconds(ACCESS_TOKEN_EXPIRATION_SECONDS)))
-                .signWith(SECRET_KEY)
+                .setExpiration(Date.from(now.plusSeconds(properties.accessTokenExpirationSeconds())))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -50,14 +55,14 @@ public class JwtTokenGenerator implements TokenGenerator {
     public String hashToken(String rawToken) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(rawToken.getBytes());
+            byte[] hash = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
 
             StringBuilder hex = new StringBuilder();
             for (byte b : hash) {
                 hex.append(String.format("%02x", b));
             }
-            return hex.toString();
 
+            return hex.toString();
         } catch (Exception e) {
             throw new RuntimeException("Token hashing failed", e);
         }
