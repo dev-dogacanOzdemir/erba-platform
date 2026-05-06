@@ -1,18 +1,42 @@
 package com.appsolute.erba.identity.rest.controller;
 
-import com.appsolute.erba.identity.application.dto.*;
+import com.appsolute.erba.identity.application.dto.CreateEmployeeProfileCommand;
+import com.appsolute.erba.identity.application.dto.CreateEmployeeSensitiveInfoCommand;
+import com.appsolute.erba.identity.application.dto.CreateIdentityUserCommand;
+import com.appsolute.erba.identity.application.dto.CreateIdentityUserResult;
+import com.appsolute.erba.identity.application.dto.GetEmployeeProfileResult;
+import com.appsolute.erba.identity.application.dto.GetIdentityUserResult;
+import com.appsolute.erba.identity.application.dto.UpdateEmployeeProfileCommand;
+import com.appsolute.erba.identity.application.dto.UpdateIdentityUserCommand;
 import com.appsolute.erba.identity.application.service.CreateIdentityUserService;
 import com.appsolute.erba.identity.application.service.DeleteIdentityUserService;
 import com.appsolute.erba.identity.application.service.GetIdentityUserService;
 import com.appsolute.erba.identity.application.service.UpdateIdentityUserService;
-import com.appsolute.erba.identity.domain.valueobject.*;
-import com.appsolute.erba.identity.rest.dto.*;
+import com.appsolute.erba.identity.domain.valueobject.Department;
+import com.appsolute.erba.identity.domain.valueobject.EmploymentType;
+import com.appsolute.erba.identity.domain.valueobject.Position;
+import com.appsolute.erba.identity.domain.valueobject.UserStatus;
+import com.appsolute.erba.identity.domain.valueobject.UserType;
+import com.appsolute.erba.identity.rest.dto.CreateIdentityUserRequest;
+import com.appsolute.erba.identity.rest.dto.CreateIdentityUserResponse;
+import com.appsolute.erba.identity.rest.dto.GetEmployeeProfileResponse;
+import com.appsolute.erba.identity.rest.dto.GetIdentityUserResponse;
+import com.appsolute.erba.identity.rest.dto.UpdateEmployeeProfileRequest;
+import com.appsolute.erba.identity.rest.dto.UpdateIdentityUserRequest;
 import com.appsolute.erba.identity.rest.mapper.EnumConverter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
@@ -30,7 +54,6 @@ public class IdentityUserController {
     @ResponseStatus(HttpStatus.CREATED)
     public CreateIdentityUserResponse create(@Valid @RequestBody CreateIdentityUserRequest request) {
         CreateIdentityUserResult result = createIdentityUserService.create(toCommand(request));
-
         return new CreateIdentityUserResponse(result.identityUserId());
     }
 
@@ -109,10 +132,7 @@ public class IdentityUserController {
         );
     }
 
-    private UpdateIdentityUserCommand toCommand(
-            UUID id,
-            UpdateIdentityUserRequest request
-    ) {
+    private UpdateIdentityUserCommand toCommand(UUID id, UpdateIdentityUserRequest request) {
         return new UpdateIdentityUserCommand(
                 id,
                 request.authUserId(),

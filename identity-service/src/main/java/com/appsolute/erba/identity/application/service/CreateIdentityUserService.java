@@ -41,7 +41,6 @@ public class CreateIdentityUserService {
         IdentityUser savedUser = identityUserRepository.save(identityUser);
 
         CreateEmployeeProfileCommand profileCommand = command.employeeProfile();
-
         EmployeeProfile employeeProfile = EmployeeProfile.create(
                 savedUser.getId(),
                 profileCommand.employeeNumber(),
@@ -51,11 +50,9 @@ public class CreateIdentityUserService {
                 profileCommand.hireDate(),
                 profileCommand.birthDate()
         );
-
         employeeProfileRepository.save(employeeProfile);
 
         CreateEmployeeSensitiveInfoCommand sensitiveCommand = command.sensitiveInfo();
-
         EmployeeSensitiveInfo sensitiveInfo = EmployeeSensitiveInfo.create(
                 savedUser.getId(),
                 sensitiveCommand.nationalId(),
