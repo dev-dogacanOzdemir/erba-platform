@@ -2,6 +2,7 @@ package com.appsolute.erba.auth.rest.controller;
 
 import com.appsolute.erba.auth.application.dto.*;
 import com.appsolute.erba.auth.application.service.LoginService;
+import com.appsolute.erba.auth.application.service.LogoutService;
 import com.appsolute.erba.auth.application.service.RefreshService;
 import com.appsolute.erba.auth.application.service.RegisterService;
 import com.appsolute.erba.auth.infrastructure.security.cookie.RefreshTokenCookieService;
@@ -24,17 +25,20 @@ public class AuthController {
     private final RegisterService registerService;
     private final LoginService loginService;
     private final RefreshService refreshService;
+    private final LogoutService logoutService;
     private final RefreshTokenCookieService refreshTokenCookieService;
 
     public AuthController(
             RegisterService registerService,
             LoginService loginService,
             RefreshService refreshService,
+            LogoutService logoutService,
             RefreshTokenCookieService refreshTokenCookieService
     ) {
         this.registerService = registerService;
         this.loginService = loginService;
         this.refreshService = refreshService;
+        this.logoutService = logoutService;
         this.refreshTokenCookieService = refreshTokenCookieService;
     }
 
@@ -82,6 +86,22 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(ApiResponse.success(response));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
+        try {
+            String refreshToken = refreshTokenCookieService.extractRefreshToken(request);
+            logoutService.logout(new LogoutCommand(refreshToken));
+        } catch (IllegalArgumentException ignored) {
+            // Cookie yoksa da logout başarılı kabul edilir.
+        }
+
+        ResponseCookie clearCookie = refreshTokenCookieService.clearRefreshTokenCookie();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
+                .body(ApiResponse.success(null));
     }
 
     private RegisterCommand toCommand(RegisterRequest request) {
