@@ -1,6 +1,5 @@
-package com.appsolute.erba.auth.infrastructure.security.jwt;
+package com.appsolute.erba.shared.security;
 
-import com.appsolute.erba.auth.application.port.TokenValidator;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,19 +8,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
 
-@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final TokenValidator tokenValidator;
+    private final JwtTokenValidator jwtTokenValidator;
 
-    public JwtAuthenticationFilter(TokenValidator tokenValidator) {
-        this.tokenValidator = tokenValidator;
+    public JwtAuthenticationFilter(JwtTokenValidator jwtTokenValidator) {
+        this.jwtTokenValidator = jwtTokenValidator;
     }
 
     @Override
@@ -41,14 +38,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authorizationHeader.substring(7);
 
         try {
-            TokenValidator.ValidatedToken validatedToken =
-                    tokenValidator.validateAccessToken(token);
+            AuthenticatedUser user = jwtTokenValidator.validate(token);
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            validatedToken.userId(),
+                            user,
                             null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + validatedToken.role().name()))
+                            List.of(new SimpleGrantedAuthority("ROLE_" + user.role()))
                     );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);

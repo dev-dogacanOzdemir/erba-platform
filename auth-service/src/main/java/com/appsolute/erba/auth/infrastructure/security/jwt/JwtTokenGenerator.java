@@ -2,6 +2,7 @@ package com.appsolute.erba.auth.infrastructure.security.jwt;
 
 import com.appsolute.erba.auth.application.port.TokenGenerator;
 import com.appsolute.erba.auth.domain.valueobject.AuthRole;
+import com.appsolute.erba.shared.security.JwtProperties;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -17,10 +18,10 @@ import java.util.UUID;
 @Component
 public class JwtTokenGenerator implements TokenGenerator {
 
-    private final AuthJwtProperties properties;
+    private final JwtProperties properties;
     private final SecretKey secretKey;
 
-    public JwtTokenGenerator(AuthJwtProperties properties) {
+    public JwtTokenGenerator(JwtProperties properties) {
         this.properties = properties;
         this.secretKey = Keys.hmacShaKeyFor(
                 properties.secret().getBytes(StandardCharsets.UTF_8)

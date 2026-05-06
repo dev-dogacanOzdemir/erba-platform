@@ -1,6 +1,6 @@
 package com.appsolute.erba.auth.infrastructure.config;
 
-import com.appsolute.erba.auth.infrastructure.security.jwt.JwtAuthenticationFilter;
+import com.appsolute.erba.shared.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,9 +10,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.appsolute.erba.shared.security.SharedSecurityBeansConfig;
+import org.springframework.context.annotation.Import;
 
 @Configuration
 @EnableWebSecurity
+@Import(SharedSecurityBeansConfig.class)
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;

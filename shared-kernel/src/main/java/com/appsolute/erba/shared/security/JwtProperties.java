@@ -1,9 +1,9 @@
-package com.appsolute.erba.auth.infrastructure.security.jwt;
+package com.appsolute.erba.shared.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "auth.jwt")
-public record AuthJwtProperties(
+public record JwtProperties(
         String secret,
         long accessTokenExpirationSeconds
 ) {
