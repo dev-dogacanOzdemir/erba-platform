@@ -10,7 +10,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record UpdateIdentityUserRequest(
-        @NotNull(message = "Auth user id boş olamaz")
         UUID authUserId,
         @NotNull(message = "Kullanıcı tipi boş olamaz")
         UserTypeRequest userType,
