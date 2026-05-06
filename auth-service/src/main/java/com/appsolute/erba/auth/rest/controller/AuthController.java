@@ -1,8 +1,10 @@
 package com.appsolute.erba.auth.rest.controller;
 
-import com.appsolute.erba.auth.application.dto.LoginRequest;
-import com.appsolute.erba.auth.application.dto.LoginResponse;
-import com.appsolute.erba.auth.application.usecase.LoginUseCase;
+import com.appsolute.erba.auth.application.dto.RegisterCommand;
+import com.appsolute.erba.auth.application.dto.RegisterResult;
+import com.appsolute.erba.auth.application.service.RegisterService;
+import com.appsolute.erba.auth.rest.dto.RegisterRequest;
+import com.appsolute.erba.auth.rest.dto.RegisterResponse;
 import com.appsolute.erba.shared.response.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -11,15 +13,33 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private final LoginUseCase loginUseCase;
+    private final RegisterService registerService;
 
-    public AuthController(LoginUseCase loginUseCase) {
-        this.loginUseCase = loginUseCase;
+    public AuthController(RegisterService registerService) {
+        this.registerService = registerService;
     }
 
-    @PostMapping("/login")
-    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        LoginResponse response = loginUseCase.login(request);
-        return ApiResponse.success(response);
+    @PostMapping("/register")
+    public ApiResponse<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+        RegisterResult result = registerService.register(toCommand(request));
+        return ApiResponse.success(toResponse(result));
+    }
+
+    private RegisterCommand toCommand(RegisterRequest request) {
+        return new RegisterCommand(
+                request.email(),
+                request.password()
+        );
+    }
+
+    private RegisterResponse toResponse(RegisterResult result) {
+        return new RegisterResponse(
+                result.userId(),
+                result.email(),
+                result.role().name(),
+                result.role().getLabel(),
+                result.status().name(),
+                result.status().getLabel()
+        );
     }
 }

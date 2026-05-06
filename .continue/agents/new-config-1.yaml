@@ -1,0 +1,17 @@
+name: Appsolute Local AI
+version: 1.0.0
+schema: v1
+
+models:
+  - name: Qwen Server
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: http://100.89.123.5:11434
+
+context:
+  - provider: code
+  - provider: diff
+  - provider: codebase
+  - provider: terminal
+  - provider: problems
+  - provider: folder

@@ -1,16 +1,18 @@
 package com.appsolute.erba.auth.domain.port;
 
-import com.appsolute.erba.auth.domain.valueobject.UserId;
+import com.appsolute.erba.auth.domain.model.RefreshToken;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface RefreshTokenRepository {
 
-    void revokeActiveTokensByUserId(UserId userId);
+    RefreshToken save(RefreshToken refreshToken);
 
-    void save(
-            UserId userId,
-            String tokenHash,
-            LocalDateTime expiresAt
-    );
+    Optional<RefreshToken> findByTokenHash(String tokenHash);
+
+    List<RefreshToken> findActiveTokensByUserId(UUID userId);
+
+    void revokeAllActiveTokensByUserId(UUID userId);
 }

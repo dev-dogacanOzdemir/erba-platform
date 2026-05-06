@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: identity-service
+  profiles:
+    active: dev
 
   datasource:
     url: jdbc:postgresql://localhost:5432/erba_platform

@@ -1,4 +1,4 @@
-package com.appsolute.erba.identity.infrastructure.persistence;
+package com.appsolute.erba.identity.infrastructure.persistence.adapter;
 
 import com.appsolute.erba.identity.domain.model.EmployeeSensitiveInfo;
 import com.appsolute.erba.identity.domain.port.EmployeeSensitiveInfoRepository;
