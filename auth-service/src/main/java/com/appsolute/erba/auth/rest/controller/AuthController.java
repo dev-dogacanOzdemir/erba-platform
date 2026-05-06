@@ -1,15 +1,9 @@
 package com.appsolute.erba.auth.rest.controller;
 
 import com.appsolute.erba.auth.application.dto.*;
-import com.appsolute.erba.auth.application.service.LoginService;
-import com.appsolute.erba.auth.application.service.LogoutService;
-import com.appsolute.erba.auth.application.service.RefreshService;
-import com.appsolute.erba.auth.application.service.RegisterService;
+import com.appsolute.erba.auth.application.service.*;
 import com.appsolute.erba.auth.infrastructure.security.cookie.RefreshTokenCookieService;
-import com.appsolute.erba.auth.rest.dto.LoginRequest;
-import com.appsolute.erba.auth.rest.dto.LoginResponse;
-import com.appsolute.erba.auth.rest.dto.RegisterRequest;
-import com.appsolute.erba.auth.rest.dto.RegisterResponse;
+import com.appsolute.erba.auth.rest.dto.*;
 import com.appsolute.erba.shared.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -26,6 +20,8 @@ public class AuthController {
     private final LoginService loginService;
     private final RefreshService refreshService;
     private final LogoutService logoutService;
+    private final ForgotPasswordService forgotPasswordService;
+    private final ResetPasswordService resetPasswordService;
     private final RefreshTokenCookieService refreshTokenCookieService;
 
     public AuthController(
@@ -33,12 +29,16 @@ public class AuthController {
             LoginService loginService,
             RefreshService refreshService,
             LogoutService logoutService,
+            ForgotPasswordService forgotPasswordService,
+            ResetPasswordService resetPasswordService,
             RefreshTokenCookieService refreshTokenCookieService
     ) {
         this.registerService = registerService;
         this.loginService = loginService;
         this.refreshService = refreshService;
         this.logoutService = logoutService;
+        this.forgotPasswordService = forgotPasswordService;
+        this.resetPasswordService = resetPasswordService;
         this.refreshTokenCookieService = refreshTokenCookieService;
     }
 
@@ -102,6 +102,27 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
                 .body(ApiResponse.success(null));
+    }
+
+    @PostMapping("/forgot-password")
+    public ApiResponse<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        forgotPasswordService.forgotPassword(
+                new ForgotPasswordCommand(request.email())
+        );
+
+        return ApiResponse.success(null);
+    }
+
+    @PostMapping("/reset-password")
+    public ApiResponse<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        resetPasswordService.resetPassword(
+                new ResetPasswordCommand(
+                        request.resetToken(),
+                        request.newPassword()
+                )
+        );
+
+        return ApiResponse.success(null);
     }
 
     private RegisterCommand toCommand(RegisterRequest request) {
