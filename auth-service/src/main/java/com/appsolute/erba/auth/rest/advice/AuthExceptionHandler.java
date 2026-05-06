@@ -1,6 +1,7 @@
 package com.appsolute.erba.auth.rest.advice;
 
 import com.appsolute.erba.auth.domain.exception.AuthUserAlreadyExistsException;
+import com.appsolute.erba.auth.domain.exception.InvalidPasswordResetTokenException;
 import com.appsolute.erba.auth.domain.exception.InvalidRefreshTokenException;
 import com.appsolute.erba.shared.response.ApiResponse;
 import com.appsolute.erba.shared.response.ErrorResponse;
@@ -27,6 +28,15 @@ public class AuthExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.fail(
                         new ErrorResponse("INVALID_REFRESH_TOKEN", "Geçersiz veya süresi dolmuş refresh token.")
+                ));
+    }
+
+    @ExceptionHandler(InvalidPasswordResetTokenException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidPasswordResetToken() {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.fail(
+                        new ErrorResponse("INVALID_PASSWORD_RESET_TOKEN", "Geçersiz veya süresi dolmuş şifre sıfırlama tokenı.")
                 ));
     }
 
