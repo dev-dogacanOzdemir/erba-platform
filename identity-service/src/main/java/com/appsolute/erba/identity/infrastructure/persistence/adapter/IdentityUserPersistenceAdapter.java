@@ -7,6 +7,7 @@ import com.appsolute.erba.identity.infrastructure.persistence.repository.SpringD
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,6 +46,14 @@ public class IdentityUserPersistenceAdapter implements IdentityUserRepository {
     @Override
     public boolean existsByAuthUserId(UUID authUserId) {
         return jpaRepository.existsByAuthUserId(authUserId);
+    }
+
+    @Override
+    public List<IdentityUser> findAll() {
+        return jpaRepository.findAll()
+                .stream()
+                .map(this::toDomain)
+                .toList();
     }
 
     private IdentityUserEntity toEntity(IdentityUser user) {

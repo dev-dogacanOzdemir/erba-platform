@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,6 +28,7 @@ public class IdentityUserController {
     private final UpdateIdentityUserService updateIdentityUserService;
     private final DeleteIdentityUserService deleteIdentityUserService;
     private final LinkAuthUserService linkAuthUserService;
+    private final ListIdentityUsersService listIdentityUsersService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -70,6 +72,14 @@ public class IdentityUserController {
         );
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public List<ListIdentityUserResponse> list() {
+        return listIdentityUsersService.getAll()
+                .stream()
+                .map(this::toListResponse)
+                .toList();
     }
 
     private CreateIdentityUserCommand toCommand(CreateIdentityUserRequest request) {
@@ -150,6 +160,29 @@ public class IdentityUserController {
                 request.hireDate(),
                 request.terminationDate(),
                 request.birthDate()
+        );
+    }
+
+    private ListIdentityUserResponse toListResponse(ListIdentityUserResult result) {
+        return new ListIdentityUserResponse(
+                result.id(),
+                result.authUserId(),
+
+                result.userType(),
+                result.userTypeLabel(),
+
+                result.status(),
+                result.statusLabel(),
+
+                result.email(),
+                result.firstName(),
+                result.lastName(),
+                result.phone(),
+
+                result.profilePhotoId(),
+
+                result.createdAt(),
+                result.updatedAt()
         );
     }
 }

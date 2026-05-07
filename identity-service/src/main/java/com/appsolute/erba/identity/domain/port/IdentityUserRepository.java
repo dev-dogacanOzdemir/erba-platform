@@ -2,6 +2,7 @@ package com.appsolute.erba.identity.domain.port;
 
 import com.appsolute.erba.identity.domain.model.IdentityUser;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,4 +17,6 @@ public interface IdentityUserRepository {
     boolean existsByEmail(String email);
 
     boolean existsByAuthUserId(UUID authUserId);
+
+    List<IdentityUser> findAll();
 }
