@@ -86,3 +86,49 @@ export async function getIdentityUser(id: string) {
 
     return response.data;
 }
+
+export interface UpdateIdentityUserRequest {
+    authUserId?: string | null;
+    userType?: string;
+    status?: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    profilePhotoId?: string | null;
+    employeeProfile?: {
+        employeeNumber?: string;
+        department?: string;
+        position?: string;
+        employmentType?: string;
+        hireDate?: string;
+        terminationDate?: string | null;
+        birthDate?: string;
+    };
+}
+
+export async function updateIdentityUser(
+    id: string,
+    request: UpdateIdentityUserRequest
+) {
+    await identityApiClient.put(
+        `/api/v1/identity-users/${id}`,
+        request
+    );
+}
+
+export async function deleteIdentityUser(id: string) {
+    await identityApiClient.delete(
+        `/api/v1/identity-users/${id}`
+    );
+}
+
+export async function linkAuthUser(
+    identityUserId: string,
+    authUserId: string
+) {
+    await identityApiClient.patch(
+        `/api/v1/identity-users/${identityUserId}/link-auth-user`,
+        { authUserId }
+    );
+}
