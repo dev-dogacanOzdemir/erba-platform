@@ -6,6 +6,7 @@ import com.appsolute.erba.auth.infrastructure.persistence.entity.AuthUserJpaEnti
 import com.appsolute.erba.auth.infrastructure.persistence.repository.SpringDataAuthUserJpaRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +35,14 @@ public class AuthUserPersistenceAdapter implements AuthUserRepository {
     public Optional<AuthUser> findByEmail(String email) {
         return repository.findByEmail(email)
                 .map(this::toDomain);
+    }
+
+    @Override
+    public List<AuthUser> findAll() {
+        return repository.findAll()
+                .stream()
+                .map(this::toDomain)
+                .toList();
     }
 
     @Override

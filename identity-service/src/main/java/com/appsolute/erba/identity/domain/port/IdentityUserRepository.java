@@ -14,4 +14,6 @@ public interface IdentityUserRepository {
     Optional<IdentityUser> findByAuthUserId(UUID authUserId);
 
     boolean existsByEmail(String email);
+
+    boolean existsByAuthUserId(UUID authUserId);
 }

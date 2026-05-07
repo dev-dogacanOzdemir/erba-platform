@@ -2,6 +2,7 @@ package com.appsolute.erba.auth.domain.port;
 
 import com.appsolute.erba.auth.domain.model.AuthUser;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,4 +15,6 @@ public interface AuthUserRepository {
     Optional<AuthUser> findByEmail(String email);
 
     boolean existsByEmail(String email);
+
+    List<AuthUser> findAll();
 }

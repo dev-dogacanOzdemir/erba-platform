@@ -42,6 +42,11 @@ public class IdentityUserPersistenceAdapter implements IdentityUserRepository {
         return jpaRepository.existsByEmailAndDeletedAtIsNull(email);
     }
 
+    @Override
+    public boolean existsByAuthUserId(UUID authUserId) {
+        return jpaRepository.existsByAuthUserId(authUserId);
+    }
+
     private IdentityUserEntity toEntity(IdentityUser user) {
         return IdentityUserEntity.builder()
                 .id(user.getId())

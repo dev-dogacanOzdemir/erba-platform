@@ -111,6 +111,16 @@ public class AuthUser {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void changeRole(AuthRole role) {
+        this.role = role;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void changeStatus(AuthUserStatus status) {
+        this.status = status;
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public UUID getId() {
         return id;
     }
