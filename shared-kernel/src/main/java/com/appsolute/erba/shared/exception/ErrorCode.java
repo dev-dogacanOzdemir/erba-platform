@@ -19,9 +19,10 @@ public enum ErrorCode {
     VALIDATION_ERROR("COMMON_001", "Geçersiz istek"),
 
     // SYSTEM
-    INTERNAL_ERROR("SYSTEM_001", "Beklenmeyen hata");
+    INTERNAL_ERROR("SYSTEM_001", "Beklenmeyen hata"),
 
-
+    //IDENTITY
+    AUTH_USER_ALREADY_LINKED("IDENTITY_001", "Auth kullanıcısı zaten başka bir kimlik kaydına bağlı");
 
     private final String code;
     private final String message;

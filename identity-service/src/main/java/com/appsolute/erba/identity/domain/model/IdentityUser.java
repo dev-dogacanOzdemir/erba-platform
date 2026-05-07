@@ -154,6 +154,8 @@ public class IdentityUser {
         this.updatedAt = LocalDateTime.now();
     }
 
+
+
     public UUID getId() {
         return id;
     }

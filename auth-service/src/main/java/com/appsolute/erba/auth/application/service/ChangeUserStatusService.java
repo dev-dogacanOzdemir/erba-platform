@@ -1,0 +1,40 @@
+package com.appsolute.erba.auth.application.service;
+
+import com.appsolute.erba.auth.application.dto.ChangeUserStatusCommand;
+import com.appsolute.erba.auth.domain.model.AuthUser;
+import com.appsolute.erba.auth.domain.port.AuthUserRepository;
+import com.appsolute.erba.auth.domain.port.RefreshTokenRepository;
+import com.appsolute.erba.auth.domain.valueobject.AuthUserStatus;
+import com.appsolute.erba.shared.exception.ErrorCode;
+import com.appsolute.erba.shared.exception.NotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class ChangeUserStatusService {
+
+    private final AuthUserRepository authUserRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    public ChangeUserStatusService(
+            AuthUserRepository authUserRepository,
+            RefreshTokenRepository refreshTokenRepository
+    ) {
+        this.authUserRepository = authUserRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+    }
+
+    @Transactional
+    public void changeStatus(ChangeUserStatusCommand command) {
+        AuthUser authUser = authUserRepository.findById(command.userId())
+                .filter(user -> user.getStatus() != AuthUserStatus.DELETED)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        authUser.changeStatus(command.status());
+        authUserRepository.save(authUser);
+
+        if (command.status() != AuthUserStatus.ACTIVE) {
+            refreshTokenRepository.revokeAllActiveTokensByUserId(authUser.getId());
+        }
+    }
+}

@@ -40,6 +40,10 @@ public class SecurityConfig {
                                 "/api/v1/auth/forgot-password",
                                 "/api/v1/auth/reset-password"
                         ).permitAll()
+
+                        .requestMatchers("/api/v1/auth/users/**")
+                        .hasRole("ADMIN")
+
                         .requestMatchers("/api/v1/admin/**")
                         .hasRole("ADMIN")
 

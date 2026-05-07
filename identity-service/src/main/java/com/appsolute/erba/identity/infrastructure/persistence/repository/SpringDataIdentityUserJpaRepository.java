@@ -11,4 +11,6 @@ public interface SpringDataIdentityUserJpaRepository extends JpaRepository<Ident
     Optional<IdentityUserEntity> findByAuthUserId(UUID authUserId);
 
     boolean existsByEmailAndDeletedAtIsNull(String email);
+
+    boolean existsByAuthUserId(UUID authUserId);
 }
