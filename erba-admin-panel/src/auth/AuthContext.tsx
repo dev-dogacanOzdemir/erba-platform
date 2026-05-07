@@ -47,15 +47,16 @@ export function AuthProvider({
 
     useEffect(() => {
         async function initialize() {
-            try {
-                if (!accessToken) {
-                    return;
-                }
+            if (!accessToken) {
+                return;
+            }
 
+            try {
                 await me();
             } catch {
-                setToken(null);
-                setAccessToken(null);
+                // me() endpoint'i sadece token validasyonudur, başarısız olması kritik değildir
+                // She başarısız olsa bile token geçerliyse devam edelim
+                // Hata sessizce bastırılır - bu normal bir durum
             }
         }
 

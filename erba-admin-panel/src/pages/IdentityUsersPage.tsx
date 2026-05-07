@@ -1,64 +1,111 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { listIdentityUsers, type IdentityUser } from "../api/identityApi";
-import {Link} from "react-router-dom";
+import {
+  Alert,
+  Button,
+  DataTable,
+  PageContainer,
+  PageHeader,
+  StatusBadge,
+  UserTypeBadge,
+} from "../components";
+import { Eye, Plus } from "lucide-react";
 
 export function IdentityUsersPage() {
-    const [users, setUsers] = useState<IdentityUser[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+  const [users, setUsers] = useState<IdentityUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    async function loadUsers() {
-        try {
-            setLoading(true);
-            const response = await listIdentityUsers();
-            setUsers(response);
-        } catch {
-            setError("Identity kullanıcıları yüklenemedi.");
-        } finally {
-            setLoading(false);
-        }
+  const loadUsers = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await listIdentityUsers();
+      setUsers(response);
+    } catch {
+      setError("Identity kullanıcıları yüklenemedi.");
+    } finally {
+      setLoading(false);
     }
+  }, []);
 
-    useEffect(() => {
-        loadUsers();
-    }, []);
+  useEffect(() => {
+    void loadUsers();
+  }, [loadUsers]);
 
-    if (loading) return <p>Yükleniyor...</p>;
-    if (error) return <p style={{ color: "red" }}>{error}</p>;
+  return (
+    <PageContainer>
+      <PageHeader
+        title="Identity Users"
+        description="Sistem identity kullanıcılarını yönetin"
+        action={
+          <Link to="/admin/identity-users/new" className="no-underline">
+            <Button variant="primary">
+              <Plus className="h-4 w-4" />
+              Yeni Kullanıcı
+            </Button>
+          </Link>
+        }
+      />
 
-    return (
-        <div>
-            <h1>Identity Users</h1>
+      {error && (
+        <Alert type="error" message={error} onClose={() => setError(null)} />
+      )}
 
-            <table border={1} cellPadding={8} style={{ borderCollapse: "collapse", width: "100%" }}>
-                <thead>
-                <tr>
-                    <th>Ad Soyad</th>
-                    <th>Email</th>
-                    <th>Department</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Auth Linked</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                {users.map((user) => (
-                    <tr key={user.id}>
-                        <td>{user.firstName} {user.lastName}</td>
-                        <td>{user.email}</td>
-                        <td>-</td>
-                        <td>{user.userTypeLabel} ({user.userType})</td>
-                        <td>{user.statusLabel} ({user.status})</td>
-                        <td>{user.authUserId ? "Evet" : "Hayır"}</td>
-                        <td>
-                            <Link to={`/admin/identity-users/${user.id}`}>Detay</Link>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-        </div>
-    );
+      <DataTable<IdentityUser>
+        columns={[
+          {
+            key: "firstName",
+            label: "Ad Soyad",
+            width: "20%",
+            render: (_, row) => `${row.firstName} ${row.lastName}`,
+          },
+          {
+            key: "email",
+            label: "Email",
+            width: "25%",
+          },
+          {
+            key: "userType",
+            label: "Tip",
+            render: (value) => <UserTypeBadge userType={value as string} />,
+          },
+          {
+            key: "status",
+            label: "Status",
+            render: (value) => <StatusBadge status={value as string} />,
+          },
+          {
+            key: "authUserId",
+            label: "Auth Linked",
+            render: (value) => (
+              <span
+                className={`text-sm font-medium ${
+                  value ? "text-green-600" : "text-slate-500"
+                }`}
+              >
+                {value ? "✓ Linked" : "-"}
+              </span>
+            ),
+          },
+          {
+            key: "id",
+            label: "İşlemler",
+            render: (value) => (
+              <Link to={`/admin/identity-users/${value}`} className="no-underline">
+                <Button variant="secondary" size="sm">
+                  <Eye className="h-4 w-4" />
+                  Detay
+                </Button>
+              </Link>
+            ),
+          },
+        ]}
+        data={users}
+        isLoading={loading}
+        emptyMessage="Identity kullanıcısı bulunamadı."
+      />
+    </PageContainer>
+  );
 }
