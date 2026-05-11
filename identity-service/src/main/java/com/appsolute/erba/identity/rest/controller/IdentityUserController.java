@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import com.appsolute.erba.shared.security.AuthenticatedUser;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +31,7 @@ public class IdentityUserController {
     private final DeleteIdentityUserService deleteIdentityUserService;
     private final LinkAuthUserService linkAuthUserService;
     private final ListIdentityUsersService listIdentityUsersService;
+    private final GetCurrentIdentityUserService getCurrentIdentityUserService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -80,6 +83,18 @@ public class IdentityUserController {
                 .stream()
                 .map(this::toListResponse)
                 .toList();
+    }
+
+    @GetMapping("/me")
+    public GetIdentityUserResponse me(Authentication authentication) {
+        AuthenticatedUser authenticatedUser =
+                (AuthenticatedUser) authentication.getPrincipal();
+
+        GetIdentityUserResult result = getCurrentIdentityUserService.getCurrent(
+                authenticatedUser.userId()
+        );
+
+        return toResponse(result);
     }
 
     private CreateIdentityUserCommand toCommand(CreateIdentityUserRequest request) {

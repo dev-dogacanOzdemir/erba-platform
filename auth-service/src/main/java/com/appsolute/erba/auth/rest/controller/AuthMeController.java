@@ -2,30 +2,35 @@ package com.appsolute.erba.auth.rest.controller;
 
 import com.appsolute.erba.shared.response.ApiResponse;
 import com.appsolute.erba.shared.security.AuthenticatedUser;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class AuthMeController {
 
     @GetMapping("/api/v1/auth/me")
-    public ApiResponse<MeResponse> me(Authentication authentication) {
-        AuthenticatedUser user = (AuthenticatedUser) authentication.getPrincipal();
-
+    public ApiResponse<MeResponse> me(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
         return ApiResponse.success(
                 new MeResponse(
-                        user.userId(),
-                        user.email(),
-                        user.role()
+                        authenticatedUser.userId(),
+                        authenticatedUser.email(),
+                        authenticatedUser.role(),
+                        authenticatedUser.permissions()
                 )
         );
     }
 
     public record MeResponse(
-            Object userId,
+            UUID userId,
             String email,
-            String role
+            String role,
+            List<String> permissions
     ) {
     }
 }
