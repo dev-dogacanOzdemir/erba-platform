@@ -19,4 +19,6 @@ public interface IdentityUserRepository {
     boolean existsByAuthUserId(UUID authUserId);
 
     List<IdentityUser> findAll();
+
+    
 }
