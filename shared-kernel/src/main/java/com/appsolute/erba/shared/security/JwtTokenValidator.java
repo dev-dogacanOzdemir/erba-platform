@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.UUID;
 
 public class JwtTokenValidator {
@@ -25,10 +26,16 @@ public class JwtTokenValidator {
                 .parseClaimsJws(token)
                 .getBody();
 
+        List<String> permissions = claims.get(
+                "permissions",
+                List.class
+        );
+
         return new AuthenticatedUser(
                 UUID.fromString(claims.getSubject()),
                 claims.get("email", String.class),
-                claims.get("role", String.class)
+                claims.get("role", String.class),
+                permissions == null ? List.of() : permissions
         );
     }
 }
