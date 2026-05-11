@@ -9,13 +9,13 @@ import com.appsolute.erba.identity.domain.valueobject.UserStatus;
 import com.appsolute.erba.identity.domain.valueobject.UserType;
 import com.appsolute.erba.identity.rest.dto.*;
 import com.appsolute.erba.identity.rest.mapper.EnumConverter;
+import com.appsolute.erba.shared.security.AuthenticatedUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.Authentication;
-import com.appsolute.erba.shared.security.AuthenticatedUser;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,8 +35,14 @@ public class IdentityUserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateIdentityUserResponse create(@Valid @RequestBody CreateIdentityUserRequest request) {
-        CreateIdentityUserResult result = createIdentityUserService.create(toCommand(request));
+    public CreateIdentityUserResponse create(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @Valid @RequestBody CreateIdentityUserRequest request
+    ) {
+        CreateIdentityUserResult result = createIdentityUserService.create(
+                toCommand(authenticatedUser.userId(), request)
+        );
+
         return new CreateIdentityUserResponse(result.identityUserId());
     }
 
@@ -48,27 +54,41 @@ public class IdentityUserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @PathVariable("id") UUID id,
             @Valid @RequestBody UpdateIdentityUserRequest request
     ) {
-        updateIdentityUserService.update(toCommand(id, request));
+        updateIdentityUserService.update(
+                toCommand(authenticatedUser.userId(), id, request)
+        );
+
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") UUID id) {
-        deleteIdentityUserService.delete(id);
+    public void delete(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @PathVariable("id") UUID id
+    ) {
+        deleteIdentityUserService.delete(
+                new DeleteIdentityUserCommand(
+                        authenticatedUser.userId(),
+                        id
+                )
+        );
     }
 
     @PatchMapping("/{id}/link-auth-user")
     public ResponseEntity<Void> linkAuthUser(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @PathVariable("id") UUID id,
             @Valid @RequestBody LinkAuthUserRequest request
     ) {
 
         linkAuthUserService.link(
                 new LinkAuthUserCommand(
+                        authenticatedUser.userId(),
                         id,
                         request.authUserId()
                 )
@@ -86,10 +106,9 @@ public class IdentityUserController {
     }
 
     @GetMapping("/me")
-    public GetIdentityUserResponse me(Authentication authentication) {
-        AuthenticatedUser authenticatedUser =
-                (AuthenticatedUser) authentication.getPrincipal();
-
+    public GetIdentityUserResponse me(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
         GetIdentityUserResult result = getCurrentIdentityUserService.getCurrent(
                 authenticatedUser.userId()
         );
@@ -97,8 +116,12 @@ public class IdentityUserController {
         return toResponse(result);
     }
 
-    private CreateIdentityUserCommand toCommand(CreateIdentityUserRequest request) {
+    private CreateIdentityUserCommand toCommand(
+            UUID actorUserId,
+            CreateIdentityUserRequest request
+    ) {
         return new CreateIdentityUserCommand(
+                actorUserId,
                 EnumConverter.toDomain(request.userType()),
                 request.email(),
                 request.firstName(),
@@ -151,8 +174,13 @@ public class IdentityUserController {
         );
     }
 
-    private UpdateIdentityUserCommand toCommand(UUID id, UpdateIdentityUserRequest request) {
+    private UpdateIdentityUserCommand toCommand(
+            UUID actorUserId,
+            UUID id,
+            UpdateIdentityUserRequest request
+    ) {
         return new UpdateIdentityUserCommand(
+                actorUserId,
                 id,
                 request.authUserId(),
                 EnumConverter.toDomain(request.userType()),
@@ -182,20 +210,15 @@ public class IdentityUserController {
         return new ListIdentityUserResponse(
                 result.id(),
                 result.authUserId(),
-
                 result.userType(),
                 result.userTypeLabel(),
-
                 result.status(),
                 result.statusLabel(),
-
                 result.email(),
                 result.firstName(),
                 result.lastName(),
                 result.phone(),
-
                 result.profilePhotoId(),
-
                 result.createdAt(),
                 result.updatedAt()
         );

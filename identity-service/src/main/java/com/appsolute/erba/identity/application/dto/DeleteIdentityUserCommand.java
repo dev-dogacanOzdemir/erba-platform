@@ -2,9 +2,8 @@ package com.appsolute.erba.identity.application.dto;
 
 import java.util.UUID;
 
-public record LinkAuthUserCommand(
+public record DeleteIdentityUserCommand(
         UUID actorUserId,
-        UUID identityUserId,
-        UUID authUserId
+        UUID identityUserId
 ) {
 }

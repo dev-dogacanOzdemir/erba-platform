@@ -4,6 +4,7 @@ import com.appsolute.erba.identity.application.dto.CreateEmployeeProfileCommand;
 import com.appsolute.erba.identity.application.dto.CreateEmployeeSensitiveInfoCommand;
 import com.appsolute.erba.identity.application.dto.CreateIdentityUserCommand;
 import com.appsolute.erba.identity.application.dto.CreateIdentityUserResult;
+import com.appsolute.erba.identity.application.port.AuditEventPublisher;
 import com.appsolute.erba.identity.domain.model.EmployeeProfile;
 import com.appsolute.erba.identity.domain.model.EmployeeSensitiveInfo;
 import com.appsolute.erba.identity.domain.model.IdentityUser;
@@ -23,6 +24,7 @@ public class CreateIdentityUserService {
     private final IdentityUserRepository identityUserRepository;
     private final EmployeeProfileRepository employeeProfileRepository;
     private final EmployeeSensitiveInfoRepository employeeSensitiveInfoRepository;
+    private final AuditEventPublisher auditEventPublisher;
 
     @Transactional
     public CreateIdentityUserResult create(CreateIdentityUserCommand command) {
@@ -41,6 +43,7 @@ public class CreateIdentityUserService {
         IdentityUser savedUser = identityUserRepository.save(identityUser);
 
         CreateEmployeeProfileCommand profileCommand = command.employeeProfile();
+
         EmployeeProfile employeeProfile = EmployeeProfile.create(
                 savedUser.getId(),
                 profileCommand.employeeNumber(),
@@ -50,9 +53,11 @@ public class CreateIdentityUserService {
                 profileCommand.hireDate(),
                 profileCommand.birthDate()
         );
+
         employeeProfileRepository.save(employeeProfile);
 
         CreateEmployeeSensitiveInfoCommand sensitiveCommand = command.sensitiveInfo();
+
         EmployeeSensitiveInfo sensitiveInfo = EmployeeSensitiveInfo.create(
                 savedUser.getId(),
                 sensitiveCommand.nationalId(),
@@ -60,6 +65,14 @@ public class CreateIdentityUserService {
         );
 
         employeeSensitiveInfoRepository.save(sensitiveInfo);
+
+        auditEventPublisher.publish(
+                command.actorUserId(),
+                "IDENTITY_USER_CREATED",
+                "IDENTITY_USER",
+                savedUser.getId(),
+                "Identity user created: " + savedUser.getEmail()
+        );
 
         return new CreateIdentityUserResult(savedUser.getId());
     }
