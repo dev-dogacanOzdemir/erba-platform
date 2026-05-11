@@ -1,6 +1,7 @@
 package com.appsolute.erba.auth.application.service;
 
 import com.appsolute.erba.auth.application.dto.ChangeUserStatusCommand;
+import com.appsolute.erba.auth.application.port.AuditEventPublisher;
 import com.appsolute.erba.auth.domain.model.AuthUser;
 import com.appsolute.erba.auth.domain.port.AuthUserRepository;
 import com.appsolute.erba.auth.domain.port.RefreshTokenRepository;
@@ -15,13 +16,15 @@ public class ChangeUserStatusService {
 
     private final AuthUserRepository authUserRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AuditEventPublisher auditEventPublisher;
 
     public ChangeUserStatusService(
             AuthUserRepository authUserRepository,
-            RefreshTokenRepository refreshTokenRepository
-    ) {
+            RefreshTokenRepository refreshTokenRepository, AuditEventPublisher auditEventPublisher
+            ) {
         this.authUserRepository = authUserRepository;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.auditEventPublisher = auditEventPublisher;
     }
 
     @Transactional
@@ -31,6 +34,18 @@ public class ChangeUserStatusService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         authUser.changeStatus(command.status());
+
+        auditEventPublisher.publish(
+                command.actorUserId(),
+                "AUTH_USER_STATUS_CHANGED",
+                "AUTH_USER",
+                authUser.getId(),
+                "User status changed for user "
+                        + authUser.getEmail()
+                        + " to "
+                        + authUser.getStatus().name()
+        );
+
         authUserRepository.save(authUser);
 
         if (command.status() != AuthUserStatus.ACTIVE) {

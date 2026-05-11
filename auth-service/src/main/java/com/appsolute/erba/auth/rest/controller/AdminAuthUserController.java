@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.appsolute.erba.shared.security.AuthenticatedUser;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,11 +40,13 @@ public class AdminAuthUserController {
 
     @PatchMapping("/{id}/role")
     public ResponseEntity<Void> changeRole(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @PathVariable("id") UUID id,
             @Valid @RequestBody ChangeUserRoleRequest request
     ) {
         changeUserRoleService.changeRole(
                 new ChangeUserRoleCommand(
+                        authenticatedUser.userId(),
                         id,
                         request.role()
                 )
@@ -53,11 +57,13 @@ public class AdminAuthUserController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> changeStatus(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @PathVariable("id") UUID id,
             @Valid @RequestBody ChangeUserStatusRequest request
     ) {
         changeUserStatusService.changeStatus(
                 new ChangeUserStatusCommand(
+                        authenticatedUser.userId(),
                         id,
                         request.status()
                 )
@@ -69,10 +75,12 @@ public class AdminAuthUserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<CreateAuthUserByAdminResponse> create(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @Valid @RequestBody CreateAuthUserByAdminRequest request
     ) {
         CreateAuthUserByAdminResult result = createAuthUserByAdminService.create(
                 new CreateAuthUserByAdminCommand(
+                        authenticatedUser.userId(),
                         request.email(),
                         request.temporaryPassword(),
                         request.role(),

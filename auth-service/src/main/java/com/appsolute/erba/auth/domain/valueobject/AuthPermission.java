@@ -13,7 +13,9 @@ public enum AuthPermission {
     PURCHASE_REQUEST_APPROVE("Satınalma talebi onaylama"),
 
     TASK_READ("İş takip kayıtlarını görüntüleme"),
-    TASK_MANAGE("İş takip kayıtlarını yönetme");
+    TASK_MANAGE("İş takip kayıtlarını yönetme"),
+
+    AUDIT_LOG_READ("Audit loglarını görüntüleme");
 
     private final String label;
 

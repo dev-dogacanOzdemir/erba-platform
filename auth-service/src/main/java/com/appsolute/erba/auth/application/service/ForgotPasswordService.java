@@ -1,6 +1,7 @@
 package com.appsolute.erba.auth.application.service;
 
 import com.appsolute.erba.auth.application.dto.ForgotPasswordCommand;
+import com.appsolute.erba.auth.application.port.AuditEventPublisher;
 import com.appsolute.erba.auth.application.port.MailSender;
 import com.appsolute.erba.auth.application.port.TokenGenerator;
 import com.appsolute.erba.auth.domain.model.AuthUser;
@@ -21,17 +22,20 @@ public class ForgotPasswordService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final TokenGenerator tokenGenerator;
     private final MailSender mailSender;
+    private final AuditEventPublisher auditEventPublisher;
 
     public ForgotPasswordService(
             AuthUserRepository authUserRepository,
             PasswordResetTokenRepository passwordResetTokenRepository,
             TokenGenerator tokenGenerator,
-            MailSender mailSender
+            MailSender mailSender,
+            AuditEventPublisher auditEventPublisher
     ) {
         this.authUserRepository = authUserRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.tokenGenerator = tokenGenerator;
         this.mailSender = mailSender;
+        this.auditEventPublisher = auditEventPublisher;
     }
 
     @Transactional
@@ -56,5 +60,13 @@ public class ForgotPasswordService {
         passwordResetTokenRepository.save(resetToken);
 
         mailSender.sendPasswordResetMail(user.getEmail(), rawToken);
+
+        auditEventPublisher.publish(
+                user.getId(),
+                "PASSWORD_RESET_REQUESTED",
+                "AUTH_USER",
+                user.getId(),
+                "Password reset requested for user: " + user.getEmail()
+        );
     }
 }

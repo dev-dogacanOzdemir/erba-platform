@@ -2,6 +2,7 @@ package com.appsolute.erba.identity.application.service;
 
 import com.appsolute.erba.identity.application.dto.UpdateEmployeeProfileCommand;
 import com.appsolute.erba.identity.application.dto.UpdateIdentityUserCommand;
+import com.appsolute.erba.identity.application.port.AuditEventPublisher;
 import com.appsolute.erba.identity.domain.model.EmployeeProfile;
 import com.appsolute.erba.identity.domain.model.IdentityUser;
 import com.appsolute.erba.identity.domain.port.EmployeeProfileRepository;
@@ -17,13 +18,16 @@ public class UpdateIdentityUserService {
 
     private final IdentityUserRepository identityUserRepository;
     private final EmployeeProfileRepository employeeProfileRepository;
+    private final AuditEventPublisher auditEventPublisher;
 
     public UpdateIdentityUserService(
             IdentityUserRepository identityUserRepository,
-            EmployeeProfileRepository employeeProfileRepository
+            EmployeeProfileRepository employeeProfileRepository,
+            AuditEventPublisher auditEventPublisher
     ) {
         this.identityUserRepository = identityUserRepository;
         this.employeeProfileRepository = employeeProfileRepository;
+        this.auditEventPublisher = auditEventPublisher;
     }
 
     @Transactional
@@ -48,6 +52,14 @@ public class UpdateIdentityUserService {
         if (command.employeeProfile() != null) {
             updateEmployeeProfile(identityUser, command.employeeProfile());
         }
+
+        auditEventPublisher.publish(
+                command.actorUserId(),
+                "IDENTITY_USER_UPDATED",
+                "IDENTITY_USER",
+                identityUser.getId(),
+                "Identity user updated: " + identityUser.getEmail()
+        );
     }
 
     private void updateEmployeeProfile(

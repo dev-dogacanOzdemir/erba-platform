@@ -1,6 +1,7 @@
 package com.appsolute.erba.auth.application.service;
 
 import com.appsolute.erba.auth.application.dto.ResetPasswordCommand;
+import com.appsolute.erba.auth.application.port.AuditEventPublisher;
 import com.appsolute.erba.auth.application.port.PasswordHasher;
 import com.appsolute.erba.auth.application.port.TokenGenerator;
 import com.appsolute.erba.auth.domain.exception.InvalidPasswordResetTokenException;
@@ -20,19 +21,22 @@ public class ResetPasswordService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final TokenGenerator tokenGenerator;
     private final PasswordHasher passwordHasher;
+    private final AuditEventPublisher auditEventPublisher;
 
     public ResetPasswordService(
             PasswordResetTokenRepository passwordResetTokenRepository,
             AuthUserRepository authUserRepository,
             RefreshTokenRepository refreshTokenRepository,
             TokenGenerator tokenGenerator,
-            PasswordHasher passwordHasher
+            PasswordHasher passwordHasher,
+            AuditEventPublisher auditEventPublisher
     ) {
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.authUserRepository = authUserRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.tokenGenerator = tokenGenerator;
         this.passwordHasher = passwordHasher;
+        this.auditEventPublisher = auditEventPublisher;
     }
 
     @Transactional
@@ -59,5 +63,13 @@ public class ResetPasswordService {
         passwordResetTokenRepository.save(resetToken);
 
         refreshTokenRepository.revokeAllActiveTokensByUserId(authUser.getId());
+
+        auditEventPublisher.publish(
+                authUser.getId(),
+                "PASSWORD_RESET_COMPLETED",
+                "AUTH_USER",
+                authUser.getId(),
+                "Password reset completed for user: " + authUser.getEmail()
+        );
     }
 }

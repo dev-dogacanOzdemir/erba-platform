@@ -5,6 +5,7 @@ import com.appsolute.erba.auth.domain.valueobject.AuthRole;
 import java.util.UUID;
 
 public record ChangeUserRoleCommand(
+        UUID actorUserId,
         UUID userId,
         AuthRole role
 ) {

@@ -1,10 +1,9 @@
 package com.appsolute.erba.identity.application.service;
 
 import com.appsolute.erba.identity.application.dto.LinkAuthUserCommand;
+import com.appsolute.erba.identity.application.port.AuditEventPublisher;
 import com.appsolute.erba.identity.domain.model.IdentityUser;
 import com.appsolute.erba.identity.domain.port.IdentityUserRepository;
-import com.appsolute.erba.identity.domain.valueobject.UserStatus;
-import com.appsolute.erba.shared.exception.ConflictException;
 import com.appsolute.erba.shared.exception.ErrorCode;
 import com.appsolute.erba.shared.exception.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -14,9 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class LinkAuthUserService {
 
     private final IdentityUserRepository identityUserRepository;
+    private final AuditEventPublisher auditEventPublisher;
 
-    public LinkAuthUserService(IdentityUserRepository identityUserRepository) {
+    public LinkAuthUserService(
+            IdentityUserRepository identityUserRepository,
+            AuditEventPublisher auditEventPublisher
+    ) {
         this.identityUserRepository = identityUserRepository;
+        this.auditEventPublisher = auditEventPublisher;
     }
 
     @Transactional
@@ -24,15 +28,21 @@ public class LinkAuthUserService {
 
         IdentityUser identityUser = identityUserRepository
                 .findById(command.identityUserId())
-                .filter(user -> user.getStatus() != UserStatus.DELETED)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-
-        if (identityUserRepository.existsByAuthUserId(command.authUserId())) {
-            throw new ConflictException(ErrorCode.AUTH_USER_ALREADY_LINKED);
-        }
+                .orElseThrow(() ->
+                        new NotFoundException(ErrorCode.USER_NOT_FOUND)
+                );
 
         identityUser.linkAuthUser(command.authUserId());
 
         identityUserRepository.save(identityUser);
+
+        auditEventPublisher.publish(
+                command.actorUserId(),
+                "IDENTITY_AUTH_LINKED",
+                "IDENTITY_USER",
+                identityUser.getId(),
+                "Identity user linked with auth user: "
+                        + command.authUserId()
+        );
     }
 }

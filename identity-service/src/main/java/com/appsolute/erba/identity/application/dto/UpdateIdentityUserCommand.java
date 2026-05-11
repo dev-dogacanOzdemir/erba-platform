@@ -6,6 +6,7 @@ import com.appsolute.erba.identity.domain.valueobject.UserType;
 import java.util.UUID;
 
 public record UpdateIdentityUserCommand(
+        UUID actorUserId,
         UUID id,
         UUID authUserId,
         UserType userType,
