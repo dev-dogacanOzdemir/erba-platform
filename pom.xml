@@ -17,6 +17,7 @@
         <module>auth-service</module>
         <module>shared-kernel</module>
         <module>identity-service</module>
+        <module>audit-service</module>
     </modules>
 
     <properties>
