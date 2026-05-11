@@ -2,13 +2,14 @@ package com.appsolute.erba.identity.infrastructure.config;
 
 import com.appsolute.erba.shared.security.JwtAuthenticationFilter;
 import com.appsolute.erba.shared.security.SharedSecurityBeansConfig;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -36,8 +37,11 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/api/v1/identity-users/**")
+                        .hasAnyAuthority("IDENTITY_USER_READ", "IDENTITY_USER_MANAGE")
+
                         .requestMatchers("/api/v1/identity-users/**")
-                        .hasRole("ADMIN")
+                        .hasAuthority("IDENTITY_USER_MANAGE")
 
                         .anyRequest()
                         .authenticated()

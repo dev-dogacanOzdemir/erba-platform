@@ -46,10 +46,18 @@ public class SecurityConfig {
                                 "/api/v1/auth/forgot-password",
                                 "/api/v1/auth/reset-password"
                         ).permitAll()
-                        .requestMatchers("/api/v1/auth/users/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/employee/**").hasAnyRole("EMPLOYEE", "ADMIN")
-                        .anyRequest().authenticated()
+
+                        .requestMatchers("/api/v1/auth/users/**")
+                        .hasAuthority("AUTH_USER_MANAGE")
+
+                        .requestMatchers("/api/v1/admin/**")
+                        .hasAuthority("AUTH_USER_MANAGE")
+
+                        .requestMatchers("/api/v1/employee/**")
+                        .hasAnyAuthority("TASK_READ", "PURCHASE_REQUEST_CREATE")
+
+                        .anyRequest()
+                        .authenticated()
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
