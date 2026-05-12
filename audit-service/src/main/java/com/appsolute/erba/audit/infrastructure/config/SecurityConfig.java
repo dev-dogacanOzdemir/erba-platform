@@ -1,7 +1,9 @@
 package com.appsolute.erba.audit.infrastructure.config;
 
+import com.appsolute.erba.audit.infrastructure.security.InternalServiceTokenFilter;
 import com.appsolute.erba.shared.security.JwtAuthenticationFilter;
 import com.appsolute.erba.shared.security.SharedSecurityBeansConfig;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -20,27 +22,29 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @Import(SharedSecurityBeansConfig.class)
+@EnableConfigurationProperties(InternalServiceTokenProperties.class)
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final InternalServiceTokenProperties internalServiceTokenProperties;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            InternalServiceTokenProperties internalServiceTokenProperties
+    ) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.internalServiceTokenProperties = internalServiceTokenProperties;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/v1/audit-logs",
@@ -56,18 +60,21 @@ public class SecurityConfig {
                         .anyRequest()
                         .authenticated()
                 )
-
+                .addFilterBefore(
+                        new InternalServiceTokenFilter(
+                                internalServiceTokenProperties.serviceToken()
+                        ),
+                        UsernamePasswordAuthenticationFilter.class
+                )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
-
                 .build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
@@ -85,7 +92,6 @@ public class SecurityConfig {
         ));
 
         configuration.setAllowedHeaders(List.of("*"));
-
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =

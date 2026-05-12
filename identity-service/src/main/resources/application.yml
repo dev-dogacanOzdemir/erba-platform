@@ -36,3 +36,6 @@ auth:
   jwt:
     secret: "change-this-secret-key-must-be-at-least-32-characters-long"
     access-token-expiration-seconds: 900
+
+internal:
+  audit-service-token: "dev-internal-audit-service-token"
