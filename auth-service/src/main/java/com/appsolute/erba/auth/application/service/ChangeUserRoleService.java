@@ -1,10 +1,10 @@
 package com.appsolute.erba.auth.application.service;
 
 import com.appsolute.erba.auth.application.dto.ChangeUserRoleCommand;
-import com.appsolute.erba.auth.application.port.AuditEventPublisher;
 import com.appsolute.erba.auth.domain.model.AuthUser;
 import com.appsolute.erba.auth.domain.port.AuthUserRepository;
 import com.appsolute.erba.auth.domain.valueobject.AuthUserStatus;
+import com.appsolute.erba.shared.audit.AuditEventPublisher;
 import com.appsolute.erba.shared.exception.ErrorCode;
 import com.appsolute.erba.shared.exception.NotFoundException;
 import org.springframework.stereotype.Service;

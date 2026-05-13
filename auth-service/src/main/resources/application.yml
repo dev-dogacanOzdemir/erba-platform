@@ -25,5 +25,8 @@ auth:
     secret: "change-this-secret-key-must-be-at-least-32-characters-long"
     access-token-expiration-seconds: 900
 
-internal:
-  audit-service-token: "dev-internal-audit-service-token"
+audit:
+  client:
+    base-url: "http://localhost:8083"
+    source-service: "auth-service"
+    internal-service-token: "dev-internal-audit-service-token"

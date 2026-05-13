@@ -1,4 +1,4 @@
-package com.appsolute.erba.auth.application.port;
+package com.appsolute.erba.shared.audit;
 
 import java.util.UUID;
 
