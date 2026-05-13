@@ -1,10 +1,10 @@
 package com.appsolute.erba.identity.application.service;
 
 import com.appsolute.erba.identity.application.dto.DeleteIdentityUserCommand;
-import com.appsolute.erba.identity.application.port.AuditEventPublisher;
 import com.appsolute.erba.identity.domain.model.IdentityUser;
 import com.appsolute.erba.identity.domain.port.IdentityUserRepository;
 import com.appsolute.erba.identity.domain.valueobject.UserStatus;
+import com.appsolute.erba.shared.audit.AuditEventPublisher;
 import com.appsolute.erba.shared.exception.ErrorCode;
 import com.appsolute.erba.shared.exception.NotFoundException;
 import org.springframework.stereotype.Service;

@@ -20,7 +20,13 @@
         <dependency>
             <groupId>com.appsolute.erba</groupId>
             <artifactId>shared-kernel</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.appsolute.erba</groupId>
+            <artifactId>shared-audit-client</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- spring boot -->

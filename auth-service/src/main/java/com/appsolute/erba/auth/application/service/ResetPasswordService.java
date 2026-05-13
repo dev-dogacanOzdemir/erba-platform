@@ -1,7 +1,6 @@
 package com.appsolute.erba.auth.application.service;
 
 import com.appsolute.erba.auth.application.dto.ResetPasswordCommand;
-import com.appsolute.erba.auth.application.port.AuditEventPublisher;
 import com.appsolute.erba.auth.application.port.PasswordHasher;
 import com.appsolute.erba.auth.application.port.TokenGenerator;
 import com.appsolute.erba.auth.domain.exception.InvalidPasswordResetTokenException;
@@ -10,6 +9,7 @@ import com.appsolute.erba.auth.domain.model.PasswordResetToken;
 import com.appsolute.erba.auth.domain.port.AuthUserRepository;
 import com.appsolute.erba.auth.domain.port.PasswordResetTokenRepository;
 import com.appsolute.erba.auth.domain.port.RefreshTokenRepository;
+import com.appsolute.erba.shared.audit.AuditEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
