@@ -15,7 +15,10 @@ public enum AuthPermission {
     TASK_READ("İş takip kayıtlarını görüntüleme"),
     TASK_MANAGE("İş takip kayıtlarını yönetme"),
 
-    AUDIT_LOG_READ("Audit loglarını görüntüleme");
+    AUDIT_LOG_READ("Audit loglarını görüntüleme"),
+
+    NOTIFICATION_CREATE("Bildirim oluşturma"),
+    NOTIFICATION_READ_OWN("Kendi bildirimlerini görüntüleme");
 
     private final String label;
 
