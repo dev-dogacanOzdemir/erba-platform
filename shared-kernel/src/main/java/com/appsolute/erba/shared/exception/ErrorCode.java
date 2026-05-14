@@ -22,7 +22,10 @@ public enum ErrorCode {
     INTERNAL_ERROR("SYSTEM_001", "Beklenmeyen hata"),
 
     //IDENTITY
-    AUTH_USER_ALREADY_LINKED("IDENTITY_001", "Auth kullanıcısı zaten başka bir kimlik kaydına bağlı");
+    AUTH_USER_ALREADY_LINKED("IDENTITY_001", "Auth kullanıcısı zaten başka bir kimlik kaydına bağlı"),
+
+    //NOTIFICATION
+    NOTIFICATION_NOT_FOUND("NOTIFICATION_001", "Bildirim bulunamadı");
 
     private final String code;
     private final String message;
