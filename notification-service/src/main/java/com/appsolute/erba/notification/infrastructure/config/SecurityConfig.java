@@ -1,7 +1,9 @@
 package com.appsolute.erba.notification.infrastructure.config;
 
+import com.appsolute.erba.notification.infrastructure.security.InternalServiceTokenFilter;
 import com.appsolute.erba.shared.security.JwtAuthenticationFilter;
 import com.appsolute.erba.shared.security.SharedSecurityBeansConfig;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -20,12 +22,18 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @Import(SharedSecurityBeansConfig.class)
+@EnableConfigurationProperties(InternalServiceTokenProperties.class)
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final InternalServiceTokenProperties internalServiceTokenProperties;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            InternalServiceTokenProperties internalServiceTokenProperties
+    ) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.internalServiceTokenProperties = internalServiceTokenProperties;
     }
 
     @Bean
@@ -37,21 +45,35 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/v1/notifications",
-                                "/api/v1/notifications/**"
-                        ).hasAuthority("NOTIFICATION_CREATE")
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/v1/notifications"
+                        ).permitAll()
 
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/v1/notifications/me"
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/notifications/me",
+                                "/api/v1/notifications/me/unread-count"
                         ).hasAuthority("NOTIFICATION_READ_OWN")
 
-                        .requestMatchers(HttpMethod.PATCH,
-                                "/api/v1/notifications/*/read"
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                "/api/v1/notifications/me/read-all"
+                        ).hasAuthority("NOTIFICATION_READ_OWN")
+
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                "/api/v1/notifications/{id}/read"
                         ).hasAuthority("NOTIFICATION_READ_OWN")
 
                         .anyRequest()
                         .authenticated()
+                )
+                .addFilterBefore(
+                        new InternalServiceTokenFilter(
+                                internalServiceTokenProperties.serviceToken()
+                        ),
+                        UsernamePasswordAuthenticationFilter.class
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter,

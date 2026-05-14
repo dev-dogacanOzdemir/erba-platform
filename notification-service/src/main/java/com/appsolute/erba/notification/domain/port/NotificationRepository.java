@@ -1,8 +1,9 @@
 package com.appsolute.erba.notification.domain.port;
 
 import com.appsolute.erba.notification.domain.model.Notification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,5 +13,9 @@ public interface NotificationRepository {
 
     Optional<Notification> findById(UUID id);
 
-    List<Notification> findByRecipientUserId(UUID recipientUserId);
+    Page<Notification> findByRecipientUserId(UUID recipientUserId, Pageable pageable);
+
+    long countUnreadByRecipientUserId(UUID recipientUserId);
+
+    void markAllAsReadByRecipientUserId(UUID recipientUserId);
 }

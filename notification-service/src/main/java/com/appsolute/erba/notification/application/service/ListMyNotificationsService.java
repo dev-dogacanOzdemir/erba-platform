@@ -3,10 +3,11 @@ package com.appsolute.erba.notification.application.service;
 import com.appsolute.erba.notification.application.dto.ListNotificationResult;
 import com.appsolute.erba.notification.domain.model.Notification;
 import com.appsolute.erba.notification.domain.port.NotificationRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -19,11 +20,16 @@ public class ListMyNotificationsService {
     }
 
     @Transactional(readOnly = true)
-    public List<ListNotificationResult> list(UUID recipientUserId) {
-        return notificationRepository.findByRecipientUserId(recipientUserId)
-                .stream()
-                .map(this::toResult)
-                .toList();
+    public Page<ListNotificationResult> list(
+            UUID recipientUserId,
+            int page,
+            int size
+    ) {
+        return notificationRepository.findByRecipientUserId(
+                        recipientUserId,
+                        PageRequest.of(page, size)
+                )
+                .map(this::toResult);
     }
 
     private ListNotificationResult toResult(Notification notification) {
