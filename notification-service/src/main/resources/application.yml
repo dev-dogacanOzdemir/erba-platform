@@ -1,0 +1,41 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: notification-service
+  profiles:
+    active: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/erba_platform
+    username: erba
+    password: erba
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: notification
+        format_sql: true
+
+  flyway:
+    enabled: true
+    schemas: notification
+    default-schema: notification
+    locations: classpath:db/migration
+
+auth:
+  jwt:
+    secret: "change-this-secret-key-must-be-at-least-32-characters-long"
+    access-token-expiration-seconds: 900
+
+internal:
+  service-token: "dev-internal-notification-service-token"
+
+logging:
+  level:
+    org.hibernate.SQL: debug

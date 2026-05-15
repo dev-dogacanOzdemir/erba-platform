@@ -1,0 +1,41 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: audit-service
+  profiles:
+    active: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/erba_platform
+    username: erba
+    password: erba
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: audit
+        format_sql: true
+
+  flyway:
+    enabled: true
+    schemas: audit
+    default-schema: audit
+    locations: classpath:db/migration
+
+auth:
+  jwt:
+    secret: "change-this-secret-key-must-be-at-least-32-characters-long"
+    access-token-expiration-seconds: 900
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+internal:
+  service-token: "dev-internal-audit-service-token"
