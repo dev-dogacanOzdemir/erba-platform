@@ -20,6 +20,7 @@
         <module>audit-service</module>
         <module>shared-audit-client</module>
         <module>notification-service</module>
+        <module>shared-notification-client</module>
     </modules>
 
     <properties>
