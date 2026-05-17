@@ -1,10 +1,9 @@
-package com.appsolute.erba.notification.infrastructure.security;
+package com.appsolute.erba.auth.infrastructure.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -21,14 +20,7 @@ public class InternalServiceTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        if (!HttpMethod.POST.matches(request.getMethod())) {
-            return true;
-        }
-
-        String uri = request.getRequestURI();
-
-        return !uri.equals("/api/v1/notifications")
-                && !uri.startsWith("/api/v1/internal/");
+        return !request.getRequestURI().startsWith("/api/v1/internal/");
     }
 
     @Override

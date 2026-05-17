@@ -3,6 +3,7 @@ package com.appsolute.erba.shared.notification.client;
 import com.appsolute.erba.shared.notification.NotificationClient;
 import com.appsolute.erba.shared.notification.config.NotificationClientProperties;
 import com.appsolute.erba.shared.notification.dto.CreateNotificationRequest;
+import com.appsolute.erba.shared.notification.dto.SendTargetedNotificationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestClient;
@@ -69,5 +70,19 @@ public class HttpNotificationClient implements NotificationClient {
                     ex
             );
         }
+    }
+    @Override
+    public void sendTargetedNotification(
+            SendTargetedNotificationRequest request
+    ) {
+        restClient.post()
+                .uri("/api/v1/internal/notifications/targeted")
+                .header(
+                        "X-Internal-Service-Token",
+                        properties.internalServiceToken()
+                )
+                .body(request)
+                .retrieve()
+                .toBodilessEntity();
     }
 }
