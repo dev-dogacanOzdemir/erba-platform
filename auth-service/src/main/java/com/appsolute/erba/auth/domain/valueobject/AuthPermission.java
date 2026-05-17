@@ -11,6 +11,8 @@ public enum AuthPermission {
     PURCHASE_REQUEST_CREATE("Satınalma talebi oluşturma"),
     PURCHASE_REQUEST_REVIEW("Satınalma taleplerini inceleme"),
     PURCHASE_REQUEST_APPROVE("Satınalma talebi onaylama"),
+    PURCHASE_REQUEST_READ("Satınalma taleplerini görüntüleme"),
+    PURCHASE_REQUEST_REJECT("Satınalma talebini reddetme"),
 
     TASK_READ("İş takip kayıtlarını görüntüleme"),
     TASK_MANAGE("İş takip kayıtlarını yönetme"),
@@ -19,6 +21,8 @@ public enum AuthPermission {
 
     NOTIFICATION_CREATE("Bildirim oluşturma"),
     NOTIFICATION_READ_OWN("Kendi bildirimlerini görüntüleme");
+
+
 
     private final String label;
 

@@ -21,6 +21,7 @@
         <module>shared-audit-client</module>
         <module>notification-service</module>
         <module>shared-notification-client</module>
+        <module>purchase-service</module>
     </modules>
 
     <properties>

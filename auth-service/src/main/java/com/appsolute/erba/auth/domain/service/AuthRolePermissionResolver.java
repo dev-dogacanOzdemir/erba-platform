@@ -17,6 +17,8 @@ public class AuthRolePermissionResolver {
             case EMPLOYEE -> EnumSet.of(
                     AuthPermission.PURCHASE_REQUEST_CREATE,
                     AuthPermission.TASK_READ,
+                    AuthPermission.PURCHASE_REQUEST_CREATE,
+                    AuthPermission.PURCHASE_REQUEST_READ,
                     NOTIFICATION_READ_OWN
             );
         };
