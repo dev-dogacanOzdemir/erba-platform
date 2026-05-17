@@ -30,3 +30,6 @@ audit:
     base-url: "http://localhost:8083"
     source-service: "auth-service"
     internal-service-token: "dev-internal-audit-service-token"
+
+internal:
+  service-token: "dev-internal-auth-service-token"

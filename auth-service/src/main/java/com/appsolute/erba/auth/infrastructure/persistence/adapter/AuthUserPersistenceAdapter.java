@@ -2,6 +2,8 @@ package com.appsolute.erba.auth.infrastructure.persistence.adapter;
 
 import com.appsolute.erba.auth.domain.model.AuthUser;
 import com.appsolute.erba.auth.domain.port.AuthUserRepository;
+import com.appsolute.erba.auth.domain.valueobject.AuthRole;
+import com.appsolute.erba.auth.domain.valueobject.AuthUserStatus;
 import com.appsolute.erba.auth.infrastructure.persistence.entity.AuthUserJpaEntity;
 import com.appsolute.erba.auth.infrastructure.persistence.repository.SpringDataAuthUserJpaRepository;
 import org.springframework.stereotype.Component;
@@ -48,6 +50,18 @@ public class AuthUserPersistenceAdapter implements AuthUserRepository {
     @Override
     public boolean existsByEmail(String email) {
         return repository.existsByEmail(email);
+    }
+
+    @Override
+    public List<AuthUser> findActiveUsersByRole(AuthRole role) {
+        return repository
+                .findByRoleAndStatusAndDeletedAtIsNull(
+                        role,
+                        AuthUserStatus.ACTIVE
+                )
+                .stream()
+                .map(this::toDomain)
+                .toList();
     }
 
     private AuthUserJpaEntity toEntity(AuthUser domain) {

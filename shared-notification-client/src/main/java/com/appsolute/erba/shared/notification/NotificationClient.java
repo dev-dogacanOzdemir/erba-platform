@@ -1,5 +1,7 @@
 package com.appsolute.erba.shared.notification;
 
+import com.appsolute.erba.shared.notification.dto.SendTargetedNotificationRequest;
+
 import java.util.UUID;
 
 public interface NotificationClient {
@@ -12,5 +14,11 @@ public interface NotificationClient {
             String sourceService,
             String sourceResourceType,
             UUID sourceResourceId
+    );
+
+    void sendTargetedNotification(
+
+            SendTargetedNotificationRequest request
+
     );
 }

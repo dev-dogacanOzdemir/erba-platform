@@ -6,6 +6,7 @@ import com.appsolute.erba.purchase.domain.model.PurchaseRequest;
 import com.appsolute.erba.purchase.domain.port.PurchaseRequestRepository;
 import com.appsolute.erba.shared.audit.AuditEventPublisher;
 import com.appsolute.erba.shared.notification.NotificationClient;
+import com.appsolute.erba.shared.notification.dto.SendTargetedNotificationRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,19 @@ public class CreatePurchaseRequestService {
                 "purchase-service",
                 "PURCHASE_REQUEST",
                 savedPurchaseRequest.getId()
+        );
+
+        notificationClient.sendTargetedNotification(
+                new SendTargetedNotificationRequest(
+                        "PERMISSION",
+                        "PURCHASE_REQUEST_REVIEW",
+                        "Yeni satınalma talebi",
+                        "Onay bekleyen yeni bir satınalma talebi oluşturuldu.",
+                        "PURCHASE_REQUEST_CREATED",
+                        "purchase-service",
+                        "PURCHASE_REQUEST",
+                        purchaseRequest.getId()
+                )
         );
 
         return new CreatePurchaseRequestResult(savedPurchaseRequest.getId());

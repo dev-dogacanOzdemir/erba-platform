@@ -36,6 +36,11 @@ auth:
 internal:
   service-token: "dev-internal-notification-service-token"
 
+auth-service:
+  client:
+    base-url: "http://localhost:8081"
+    internal-service-token: "dev-internal-auth-service-token"
+
 logging:
   level:
     org.hibernate.SQL: debug

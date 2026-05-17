@@ -1,7 +1,9 @@
 package com.appsolute.erba.auth.infrastructure.config;
 
+import com.appsolute.erba.auth.infrastructure.security.InternalServiceTokenFilter;
 import com.appsolute.erba.shared.security.JwtAuthenticationFilter;
 import com.appsolute.erba.shared.security.SharedSecurityBeansConfig;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -21,12 +23,17 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @Import(SharedSecurityBeansConfig.class)
+@EnableConfigurationProperties(InternalServiceTokenProperties.class)
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final InternalServiceTokenProperties internalServiceTokenProperties;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            InternalServiceTokenProperties internalServiceTokenProperties) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.internalServiceTokenProperties = internalServiceTokenProperties;
     }
 
     @Bean
@@ -47,6 +54,8 @@ public class SecurityConfig {
                                 "/api/v1/auth/reset-password"
                         ).permitAll()
 
+                        .requestMatchers("/api/v1/internal/**").permitAll()
+
                         .requestMatchers("/api/v1/auth/users/**")
                         .hasAuthority("AUTH_USER_MANAGE")
 
@@ -58,6 +67,12 @@ public class SecurityConfig {
 
                         .anyRequest()
                         .authenticated()
+                )
+                .addFilterBefore(
+                        new InternalServiceTokenFilter(
+                                internalServiceTokenProperties.serviceToken()
+                        ),
+                        UsernamePasswordAuthenticationFilter.class
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
