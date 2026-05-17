@@ -25,7 +25,10 @@ public enum ErrorCode {
     AUTH_USER_ALREADY_LINKED("IDENTITY_001", "Auth kullanıcısı zaten başka bir kimlik kaydına bağlı"),
 
     //NOTIFICATION
-    NOTIFICATION_NOT_FOUND("NOTIFICATION_001", "Bildirim bulunamadı");
+    NOTIFICATION_NOT_FOUND("NOTIFICATION_001", "Bildirim bulunamadı"),
+
+    //PURCHASE
+    PURCHASE_REQUEST_NOT_FOUND("PURCHASE_001", "Satınalma talebi bulunamadı");
 
     private final String code;
     private final String message;
